@@ -29,6 +29,11 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
 
 
 def game_over(screen: pg.Surface) -> None:
+    """
+    ゲームオーバー画面を表示する
+    引数：screen
+    戻り値：なし
+    """
     bg_img = pg.Surface((WIDTH, HEIGHT))
     pg.draw.rect(bg_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
     bg_img.set_alpha(200)
@@ -53,6 +58,11 @@ def game_over(screen: pg.Surface) -> None:
 
 
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    時間と共に爆弾が拡大、加速する
+    引数；なし
+    戻り値：タプル(リスト[画像], リスト[加速度])
+    """
     bb_imgs = []
     for r in range(1, 11):
         bb_img = pg.Surface((20*r, 20*r))
@@ -66,6 +76,11 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
 
 
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    飛ぶ方向に従ってこうかとん画像を切り替える
+    引数：なし
+    戻り値：dict{向き: 画像}
+    """
     kk_img = pg.image.load("fig/3.png")
     kk_flip = pg.transform.flip(kk_img, True, False)
     kk_dict = {
@@ -83,6 +98,49 @@ def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     return kk_dict
 
 
+def preparation(screen: pg.Surface) -> bool:
+    """
+    ロード画面を表示するもの
+    引数：screen
+    戻り値：False
+    """
+    count = 3
+    fonto = pg.font.Font(None, 100)
+
+    bg_copy = screen.copy()
+
+    clock = pg.time.Clock()
+
+    while True:
+
+        screen.blit(bg_copy, [0, 0])
+
+        if count <= 0:
+            count = "GO!!!"
+
+        txt = fonto.render(f"{count}", True, (0, 0, 0))
+        txt_rect = txt.get_rect()
+        txt_rect.center = (WIDTH // 2, HEIGHT // 2)
+
+        screen.blit(txt, txt_rect) 
+
+        pg.display.update()
+        
+        start_time = pg.time.get_ticks()
+        while pg.time.get_ticks() - start_time < 1000:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return False
+
+            clock.tick(60)
+
+
+        if type(count) == int:
+            count -= 1
+        else:
+            break
+    return True
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -97,6 +155,8 @@ def main():
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
     tmr = 0
+    score = 0
+    judge_pre = False
     bb_imgs, bb_accs = init_bb_imgs()
     vx, vy = +5, +5
     clock = pg.time.Clock()
@@ -104,12 +164,19 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        
             
         if kk_rct.colliderect(bb_rct):
             game_over(screen)
             print("爆！")
             return
         screen.blit(bg_img, [0, 0])
+
+        if not judge_pre:
+            pg.display.update()
+            judge_pre = preparation(screen)
+            if not judge_pre:
+                return
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
