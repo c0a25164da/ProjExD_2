@@ -102,7 +102,7 @@ def preparation(screen: pg.Surface) -> bool:
     """
     ロード画面を表示するもの
     引数：screen
-    戻り値：False
+    戻り値：True
     """
     count = 3
     fonto = pg.font.Font(None, 100)
