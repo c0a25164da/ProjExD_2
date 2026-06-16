@@ -155,7 +155,6 @@ def main():
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
     tmr = 0
-    score = 0
     judge_pre = False
     bb_imgs, bb_accs = init_bb_imgs()
     vx, vy = +5, +5
