@@ -100,20 +100,20 @@ def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
 
 def preparation(screen: pg.Surface) -> bool:
     """
-    ロード画面を表示するもの
+    ロード画面(カウントダウン)を表示するもの
     引数：screen
     戻り値：True
     """
     count = 3
     fonto = pg.font.Font(None, 100)
 
-    bg_copy = screen.copy()
+    bg_copy = screen.copy()  # screenをコピー
 
     clock = pg.time.Clock()
 
     while True:
 
-        screen.blit(bg_copy, [0, 0])
+        screen.blit(bg_copy, [0, 0])  # コピーしたscreenを表示
 
         if count <= 0:
             count = "GO!!!"
@@ -127,7 +127,7 @@ def preparation(screen: pg.Surface) -> bool:
         pg.display.update()
         
         start_time = pg.time.get_ticks()
-        while pg.time.get_ticks() - start_time < 1000:
+        while pg.time.get_ticks() - start_time < 1000:  # 1秒を取得計算している
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     return False
@@ -135,7 +135,7 @@ def preparation(screen: pg.Surface) -> bool:
             clock.tick(60)
 
 
-        if type(count) == int:
+        if type(count) == int:  # 最後にint -> strになるのでエラー回避、ロード完了処理
             count -= 1
         else:
             break
